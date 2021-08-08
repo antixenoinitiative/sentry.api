@@ -11,21 +11,16 @@ const enableAPI = 1; // Set to 0 to disable API from running
 
 require("dotenv").config();
 const zlib = require("zlib");
-const fs = require('fs');
-const Discord = require("discord.js");
 const zmq = require("zeromq");
 const api = require('express')();
 const path = require('path');
 const db = require('./db/index');
 const endpoint = require('./api/index');
-const perm = require('./permissions');
-const vision = require("@google-cloud/vision");
 
 // Global Variables
 const SOURCE_URL = 'tcp://eddn.edcd.io:9500'; //EDDN Data Stream URL
 const targetAllegiance = "Thargoid";
 const targetGovernment = "$government_Dictatorship;";
-const prefix = "-"
 let msg;
 let watchlist;
 
@@ -81,19 +76,6 @@ async function run() {
     msg = JSON.parse(zlib.inflateSync(src));
     processSystem(msg);
   }
-}
-
-function Response(data) {
-  return ({
-    header: {
-      timestamp: `${new Date().toISOString()}`,
-      softwareName: 'AXI Sentry',
-      softwareVersion: '0.1',
-    },
-    message: {
-      rows: data,
-    }
-  })
 }
 
 // API Code
