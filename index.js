@@ -22,7 +22,6 @@ const SOURCE_URL = 'tcp://eddn.edcd.io:9500'; //EDDN Data Stream URL
 const targetAllegiance = "Thargoid";
 const targetGovernment = "$government_Dictatorship;";
 let msg;
-let watchlist;
 
 // Star System processing logic
 async function processSystem(msg) {
@@ -31,41 +30,24 @@ async function processSystem(msg) {
   let time = date.getTime(timestamp); // Converting msg timestamp to Unix Epoch
 
   if (SystemAllegiance != undefined && time >= Date.now() - 86400000) { // Checking if report is recent
-    id = await db.getSysID(StarSystem);
-
-    if (watchlist.includes(StarSystem)) { // Check in watchlist
-      if (SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) { // Check if the system is under Incursion
-        db.addIncursions(id,time);
-        console.log(`Incursion Logged: ${StarSystem}`);
-        watchlist = await db.getWatchlist(); // Refresh the watchlist with the new systems to monitor
+    let id = await db.getSysID(StarSystem);
+    if (id = 0 && SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) {
+      id = await db.addSystem(StarSystem);
+    } 
+    if (id != 0) {
+      if (SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) {
+        db.setStatus(StarSystem, 1);
+        db.logIncursion(id, time);
       } else {
-        db.setStatus(StarSystem,0);
-        console.log(`${StarSystem} removed from Watchlist because alli = [${SystemAllegiance}], gov = [${SystemGovernment}]`)
-        watchlist = await db.getWatchlist();
+        db.setStatus(StarSystem, 0);
       }
-    } else { // Not in watchlist
-      if (SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) { // Check if the system is under Incursion
-        if (id == 0) { // Check if system is NOT in DB
-          db.addSystem(StarSystem).then((res) => {
-            db.addIncursions(res,time);
-          });
-
-        } else {
-          db.setStatus(StarSystem, 1);
-          db.addIncursions(id,time);
-        }
-        console.log(`System Logged: ${StarSystem}`);
-        watchlist = await db.getWatchlist();
-      }
-    }
+    }  
   }
 }
 
 // Sentry Listener
 async function run() {
   const sock = new zmq.Subscriber;
-
-  watchlist = await db.getWatchlist();
 
   sock.connect(SOURCE_URL);
   sock.subscribe('');
@@ -95,10 +77,10 @@ api.get('/styles.css', function(req, res) {
 
 api.get('/incursionshistory', async function(req, res) {
     const { rows } = await db.query(
-      `SELECT incursions.inc_id,systems.system_id,systems.name,incursions.time
-      FROM incursions
+      `SELECT incursionV2.inc_id,systems.system_id,systems.name,incursionV2.time,incursionV2.week
+      FROM incursionV2
       INNER JOIN systems
-      ON incursions.system_id=systems.system_id;`
+      ON incursionV2.system_id=systems.system_id;`
     );
     res.json(endpoint.Response(rows))
   },

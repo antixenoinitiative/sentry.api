@@ -55,14 +55,21 @@ module.exports = {
     /**
      * Function adds an Incursion to the Database
      * @author   (Mgram) Marcus Ingram
-     * @param    {Int} system_id     Database ID of the Star System
+     * @param    {Number} id        Database ID of the Star System
+     * @param    {Number} time      Unix Timestamp
      */
-    addIncursions: async (system_id,time) => {
+    logIncursion: async (id,time) => {
+        let res;
+        console.log(`Processing - id: ${id} time: ${time}`);
+        let week;
+        try { week = getWeek(time).week } catch { return console.log(`Skipping - id: ${id} time: ${time}`) }
         try {
-            pool.query(`INSERT INTO incursions(system_id,time)VALUES($1,$2)`, [system_id, time], (err, res) => { });
-        } catch (err) {
-            console.error(err);
-        }
+            res = await pool.query(`SELECT * FROM incursionV2 WHERE week = $1 AND system_id = $2`, [week,id])
+            if (res.rowCount == 0) {
+                await pool.query(`INSERT INTO incursionV2(system_id, week, time) VALUES ($1, $2, $3)`, [id, week, time]);
+                console.log(`Logged ID: ${id} WEEK: ${week}`);
+            }
+        } catch (err) { console.error(err) }
     },
 
     /**
@@ -93,7 +100,7 @@ module.exports = {
      */
     setStatus: async (name,status) => {
         try {
-            pool.query(`UPDATE systems SET status = $1 WHERE name = $2;`, [status, name], (err, res) => {});
+            await pool.query(`UPDATE systems SET status = $1 WHERE name = $2;`, [status, name]);
         } catch (err) {
             console.error(err);
         }
@@ -156,21 +163,6 @@ module.exports = {
         }
     },
   
-    // Fetch a new watchlist from the current incursion systems
-    getWatchlist: async (name) => {
-        try {
-            let list = [];
-            const { rows } = await pool.query("SELECT name FROM systems WHERE status = '1'");
-        for (let i = 0; i < rows.length; i++) {
-            list.push(rows[i].name);
-        }
-            console.log(`Watchlist: ${list}`);
-        return list; // Return System_id
-        } catch (err) {
-            console.log(err); // Return 0 if system is not in the DB
-        }
-    },
-  
     /**
      * Returns presence as string from lvl 
      * @author   (Mgram) Marcus Ingram
@@ -202,7 +194,7 @@ module.exports = {
     getIncursionsByDate: async (date) => {
         let timestamp = Date.parse(date);
         let week = getWeek(timestamp);
-        let incursions = await pool.query(`SELECT * FROM incursions WHERE time < '${week.end}' AND time > '${week.start}'`);
+        let incursions = await pool.query(`SELECT * FROM incursions WHERE week = $1`, [week]);
         let system_ids = incursions.rows.map(item => item.system_id).filter((value, index, self) => self.indexOf(value) === index)
         let systems = [];
         for (let i = 0; i < system_ids.length; i++) {
@@ -210,5 +202,5 @@ module.exports = {
             systems.push(sysname.rows[0].name);
         }
         return systems;
-    }
+    },
 }

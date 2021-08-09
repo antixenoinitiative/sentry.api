@@ -17,3 +17,9 @@ CREATE TABLE presence (
   presence_lvl      int,
   time              bigint
 );
+CREATE TABLE incursionV2 (
+  inc_id            SERIAL PRIMARY KEY,
+  system_id         int,
+  week              int,
+  time              bigint,
+);
