@@ -107,5 +107,11 @@ api.get('/presence', async function(req, res) {
   },
 );
 
+api.get('/ace', async function(req, res) {
+  const { rows } = await db.queryWarden(`SELECT * FROM ace WHERE approval = 'true'`);
+  res.json(endpoint.Response(rows));
+},
+);
+
 // Switch Statements
 if (enableListener == 1) { run(); } else { console.error(`WARN: Sentry Disabled`)}
