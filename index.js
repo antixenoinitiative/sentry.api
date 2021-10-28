@@ -31,10 +31,12 @@ async function processSystem(msg) {
 
   if (SystemAllegiance != undefined && time >= Date.now() - 86400000) { // Checking if report is recent
     let id = await db.getSysID(StarSystem);
-    if (id = 0 && SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) {
+    console.log(`${StarSystem} - A: ${SystemAllegiance} - G: ${SystemGovernment} - ID: ${id}`)
+    if (id == "0" && SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) {
+      console.log(`DETECTED`)
       id = await db.addSystem(StarSystem);
     } 
-    if (id != 0) {
+    if (id != "0") {
       if (SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) {
         db.setStatus(StarSystem, 1);
         db.logIncursion(id, time);
