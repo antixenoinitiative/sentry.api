@@ -5,7 +5,8 @@ Table commands for creating the Database in PostgreSQL
 CREATE TABLE systems (
   system_id     SERIAL PRIMARY KEY,
   name          VARCHAR(50),
-  status        bool
+  status        bool,
+  presence      int
 );
 CREATE TABLE incursions (
   inc_id            SERIAL PRIMARY KEY,
@@ -23,3 +24,9 @@ CREATE TABLE incursionV2 (
   week              int,
   time              bigint,
 );
+
+0
+1 
+2
+3
+4

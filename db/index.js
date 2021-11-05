@@ -50,12 +50,7 @@ module.exports = {
     */
     addSystem: async (name) => {
         try {
-            pool.query(`INSERT INTO systems(name,status)VALUES($1,'1')`, [name]);
-        } catch (err) {
-            console.error(err);
-        }
-        try {
-            let res = await pool.query(`INSERT INTO systems(name,status)VALUES($1,'1')`, [name]);
+            let res = await pool.query(`INSERT INTO systems(name,status,presence)VALUES($1,'1',4)`, [name]);
             return rows[0].system_id; // Return System_id
         } catch {
             return 0; // Return 0 if system is not in the DB
