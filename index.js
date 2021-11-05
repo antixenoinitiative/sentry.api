@@ -16,6 +16,7 @@ const api = require('express')();
 const path = require('path');
 const db = require('./db/index');
 const endpoint = require('./api/index');
+const cors = require('cors')
 
 // Global Variables
 const SOURCE_URL = 'tcp://eddn.edcd.io:9500'; //EDDN Data Stream URL
@@ -63,6 +64,7 @@ async function run() {
 
 // API Code
 if (enableAPI == 1) {
+  api.use(cors())
   api.listen(process.env.PORT,() => {
     console.log('[✔] Sentry API Operational');  // Upon a successful connection will log to console
   });
