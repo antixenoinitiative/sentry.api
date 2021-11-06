@@ -57,6 +57,23 @@ module.exports = {
         }
     },
 
+    updateSysInfo: async (name, msg) => {
+        let system = msg.message
+        try {
+            await pool.query(`UPDATE systems SET population = $1, coords = $2, allegiance = $3, faction = $4 WHERE name = $5`,
+            [
+                system.Population,
+                system.StarPos,
+                system.SystemAllegiance,
+                system.SystemFaction,
+                name
+            ])
+            console.log(`System Info Updated!`)
+        } catch (err) {
+            console.log(err)
+        }
+    },
+
     /**
      * Function adds an Incursion to the Database
      * @author   (Mgram) Marcus Ingram
@@ -125,7 +142,7 @@ module.exports = {
             }
             return res.rows[0].system_id;
         } catch (err) {
-            return 0; // Return 0 if system is not in the DB
+            console.log(err); // Return 0 if system is not in the DB
         }
     },
     

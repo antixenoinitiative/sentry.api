@@ -16,7 +16,7 @@ const api = require('express')();
 const path = require('path');
 const db = require('./db/index');
 const endpoint = require('./api/index');
-const cors = require('cors')
+const cors = require('cors');
 
 // Global Variables
 const SOURCE_URL = 'tcp://eddn.edcd.io:9500'; //EDDN Data Stream URL
@@ -32,11 +32,16 @@ async function processSystem(msg) {
 
   if (SystemAllegiance != undefined && time >= Date.now() - 86400000) { // Checking if report is recent
     let id = await db.getSysID(StarSystem);
-    console.log(`${StarSystem} - A: ${SystemAllegiance} - G: ${SystemGovernment} - ID: ${id}`)
+    //console.log(`${StarSystem} - A: ${SystemAllegiance} - G: ${SystemGovernment} - ID: ${id}`)
+
+    // If system does not exist in DB
     if (id == "0" && SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) {
       id = await db.addSystem(StarSystem);
-    } 
+    }
+
+    // If system does exist in DB
     if (id != "0") {
+      await db.updateSysInfo(StarSystem, msg);
       if (SystemAllegiance == targetAllegiance && SystemGovernment == targetGovernment) {
         db.setStatus(StarSystem, 1);
         db.logIncursion(id, time);

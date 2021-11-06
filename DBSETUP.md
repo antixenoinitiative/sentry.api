@@ -6,7 +6,11 @@ CREATE TABLE systems (
   system_id     SERIAL PRIMARY KEY,
   name          VARCHAR(50),
   status        bool,
-  presence      int
+  presence      int,
+  population    bigint,
+  coords        text,
+  allegiance    text,
+  faction       text,
 );
 CREATE TABLE incursions (
   inc_id            SERIAL PRIMARY KEY,
