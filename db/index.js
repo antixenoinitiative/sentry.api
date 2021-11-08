@@ -58,15 +58,17 @@ module.exports = {
     },
 
     updateSysInfo: async (name, msg) => {
+        let timestamp = Math.floor(Date.now() / 1000)
         let system = msg.message
         try {
-            await pool.query(`UPDATE systems SET population = $1, coords = $2, allegiance = $3, faction = $4 WHERE name = $5`,
+            await pool.query(`UPDATE systems SET population = $1, coords = $2, allegiance = $3, faction = $4, last_updated =$5 WHERE name = $5`,
             [
                 system.Population,
                 system.StarPos,
                 system.SystemAllegiance,
                 system.SystemFaction.Name,
-                name
+                name,
+                timestamp
             ])
             console.log(`System Info Updated!`)
         } catch (err) {

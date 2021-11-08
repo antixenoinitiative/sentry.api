@@ -29,6 +29,7 @@ async function processSystem(msg) {
   const { StarSystem, timestamp, SystemAllegiance, SystemGovernment } = msg.message;  // Destructuring msg
   let date = new Date();
   let time = date.getTime(timestamp); // Converting msg timestamp to Unix Epoch
+  console.log(msg)
 
   if (SystemAllegiance != undefined && time >= Date.now() - 86400000) { // Checking if report is recent
     let id = await db.getSysID(StarSystem);
@@ -106,6 +107,7 @@ api.get('/systems', async function(req, res) {
   },
 );
 
+/*
 api.get('/presence', async function(req, res) {
     const { rows } = await db.query(`SELECT systems.name,presence.presence_lvl,presence.time
     FROM presence
@@ -114,7 +116,7 @@ api.get('/presence', async function(req, res) {
     res.json(endpoint.Response(rows));
   },
 );
-
+*/
 api.get('/ace', async function(req, res) {
   const { rows } = await db.queryWarden(`SELECT * FROM ace WHERE approval = 'true'`);
   res.json(endpoint.Response(rows));
