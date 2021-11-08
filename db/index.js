@@ -65,7 +65,7 @@ module.exports = {
                 system.Population,
                 system.StarPos,
                 system.SystemAllegiance,
-                system.SystemFaction,
+                system.SystemFaction.Name,
                 name
             ])
             console.log(`System Info Updated!`)
