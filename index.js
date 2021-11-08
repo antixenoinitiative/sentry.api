@@ -29,7 +29,6 @@ async function processSystem(msg) {
   const { StarSystem, timestamp, SystemAllegiance, SystemGovernment } = msg.message;  // Destructuring msg
   let date = new Date();
   let time = date.getTime(timestamp); // Converting msg timestamp to Unix Epoch
-  console.log(msg)
 
   if (SystemAllegiance != undefined && time >= Date.now() - 86400000) { // Checking if report is recent
     let id = await db.getSysID(StarSystem);
