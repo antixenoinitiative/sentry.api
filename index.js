@@ -67,16 +67,17 @@ async function updateEDDBData() {
   }
 }
 
-// Runs EDDB Fetch at :00 of every hour
+// Runs EDDB Fetch at :00 of every hour (Disabled due to memory issues)
+/*
 cron.schedule('0 * * * *', async () => {
   console.log("Fetching EDDB Data")
   await updateEDDBData()
   console.log("EDDB Update Complete")
 });
+*/
 
 // Sentry Listener
 async function run() {
-  updateEDDBData();
   const sock = new zmq.Subscriber;
 
   sock.connect(SOURCE_URL);
