@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Pool } = require('pg');
 const weeks = require("./weeks/weeks.json");
+const eddb = require('../db/eddb');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }) //credentials from Heroku
 
@@ -60,14 +61,17 @@ module.exports = {
     updateSysInfo: async (name, msg) => {
         let timestamp = Math.floor(Date.now() / 1000)
         let system = msg.message
+        let res = await eddb.getEDDBSysData(system.name)
+        let eddbID = res.id 
         try {
-            await pool.query(`UPDATE systems SET population = $1, coords = $2, allegiance = $3, faction = $4, last_updated =$5 WHERE name = $6`,
+            await pool.query(`UPDATE systems SET population = $1, coords = $2, allegiance = $3, faction = $4, last_updated =$5, eddb_id = $6 WHERE name = $7`,
             [
                 system.Population,
                 system.StarPos,
                 system.SystemAllegiance,
                 system.SystemFaction.Name,
                 timestamp,
+                eddbID,
                 name,
             ])
             console.log(`System Info Updated!`)

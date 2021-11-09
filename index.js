@@ -15,7 +15,9 @@ const zmq = require("zeromq");
 const api = require('express')();
 const path = require('path');
 const db = require('./db/index');
+const eddb = require('./db/eddb');
 const endpoint = require('./api/index');
+var cron = require('node-cron');
 const cors = require('cors');
 
 // Global Variables
@@ -51,6 +53,26 @@ async function processSystem(msg) {
     }  
   }
 }
+
+// Fetches existing systems and updates them with EDDB Station Data (This is VERY slow due to large data pull)
+async function updateEDDBData() {
+  let res = await db.query(`SELECT eddb_id FROM systems`)
+  let idList = []
+  for (let system of res.rows) {
+    idList.push(system.eddb_id)
+  }
+  let systems = await eddb.getEDDBStationData(idList)
+  for (let system of systems) {
+    db.query(`UPDATE systems SET stations = $1 WHERE eddb_id = $2`, [JSON.stringify(system.stations), system.eddb_id])
+  }
+}
+
+// Runs EDDB Fetch at :00 of every hour
+cron.schedule('0 * * * *', async () => {
+  console.log("Fetching EDDB Data")
+  await updateEDDBData()
+  console.log("EDDB Update Complete")
+});
 
 // Sentry Listener
 async function run() {
