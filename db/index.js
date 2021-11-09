@@ -83,7 +83,6 @@ module.exports = {
         } catch (err) {
             console.log(err)
         }
-        console.log("System Info Updated")
     },
 
     /**
