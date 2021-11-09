@@ -76,6 +76,7 @@ cron.schedule('0 * * * *', async () => {
 
 // Sentry Listener
 async function run() {
+  updateEDDBData();
   const sock = new zmq.Subscriber;
 
   sock.connect(SOURCE_URL);
