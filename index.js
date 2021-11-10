@@ -126,7 +126,7 @@ api.get('/incursions', async function(req, res) {
 );
 
 api.get('/systems', async function(req, res) {
-    const { rows } = await db.query(`SELECT * FROM systems`);
+    const { rows } = await db.query(`SELECT system_id, name, status, presence, population, faction, coords, last_updated, eddb_id FROM systems`);
     res.json(endpoint.Response(rows))
   },
 );
