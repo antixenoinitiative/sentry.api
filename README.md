@@ -1,3 +1,8 @@
+# MIGRATED
+
+Sentry.api is now part of the Thargid.watch project, the code has been merged and these now run under the same application. https://github.com/antixenoinitiative/thargoid.watch
+
+
 <p align="center">
 <img src="https://user-images.githubusercontent.com/85346345/128631336-2f79838f-ce3a-4f6a-9318-cc2b38514180.png" width="250">
 </p>
